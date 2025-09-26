@@ -50,7 +50,7 @@ const ExistingRooms = () => {
 		try {
 			const result = await deleteRoom(roomId)
 			if (result === "") {
-				setSuccessMessage(`Room No ${roomId} was delete`)
+				setSuccessMessage(`Room No ${roomId} was deleted`)
 				fetchRooms()
 			} else {
 				console.error(`Error deleting room : ${result.message}`)
@@ -113,9 +113,10 @@ const ExistingRooms = () => {
 							</thead>
 
 							<tbody>
-								{currentRooms.map((room) => (
+								{currentRooms.map((room, index) => (
 									<tr key={room.id} className="text-center">
-										<td>{room.id}</td>
+										{/* Display sequential numbering instead of actual DB ID */}
+										<td>{indexOfFirstRoom + index + 1}</td>
 										<td>{room.roomType}</td>
 										<td>{room.roomPrice}</td>
 										<td className="gap-2">
