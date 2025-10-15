@@ -1,6 +1,9 @@
 import React, { useState } from "react"
 import moment from "moment"
-import { cancelBooking, getBookingByConfirmationCode } from "../utils/ApiFunctions"
+import {
+  cancelBooking,
+  getBookingByConfirmationCode,
+} from "../utils/ApiFunctions"
 
 const FindBooking = () => {
   const [confirmationCode, setConfirmationCode] = useState("")
@@ -20,7 +23,7 @@ const FindBooking = () => {
     guestEmail: "",
     numOfAdults: "",
     numOfChildren: "",
-    totalNumOfGuests: ""
+    totalNumOfGuests: "",
   }
 
   const [bookingInfo, setBookingInfo] = useState(emptyBookingInfo)
@@ -102,23 +105,29 @@ const FindBooking = () => {
       {!isLoading && !error && bookingInfo.bookingConfirmationCode && (
         <div className="col-md-6 mt-4 mb-5">
           <h3>Booking Information</h3>
+
           <p className="text-success">
             Confirmation Code: {bookingInfo.bookingConfirmationCode}
           </p>
           <p>Room Number: {bookingInfo.room.id || bookingInfo.roomNumber}</p>
           <p>Room Type: {bookingInfo.room.roomType}</p>
 
+          {/* ✅ Corrected Date Display (prevents timezone shift) */}
           <p>
             Check-in Date:{" "}
             {bookingInfo.checkInDate
-              ? moment(bookingInfo.checkInDate).format("MMM Do, YYYY")
+              ? moment(bookingInfo.checkInDate, "YYYY-MM-DD").format(
+                  "MMM Do, YYYY"
+                )
               : "N/A"}
           </p>
 
           <p>
             Check-out Date:{" "}
             {bookingInfo.checkOutDate
-              ? moment(bookingInfo.checkOutDate).format("MMM Do, YYYY")
+              ? moment(bookingInfo.checkOutDate, "YYYY-MM-DD").format(
+                  "MMM Do, YYYY"
+                )
               : "N/A"}
           </p>
 
@@ -131,7 +140,8 @@ const FindBooking = () => {
           {!isDeleted && (
             <button
               onClick={() => handleBookingCancellation(bookingInfo.id)}
-              className="btn btn-danger">
+              className="btn btn-danger"
+            >
               Cancel Booking
             </button>
           )}
