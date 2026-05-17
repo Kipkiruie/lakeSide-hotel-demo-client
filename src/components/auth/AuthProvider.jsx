@@ -3,19 +3,37 @@ import jwt_decode from "jwt-decode"
 
 export const AuthContext = createContext({
 	user: null,
+	isAuthenticated: false,
 	handleLogin: (token) => {},
 	handleLogout: () => {}
 })
 
 export const AuthProvider = ({ children }) => {
-	const [user, setUser] = useState(null)
+	const [user, setUser] = useState(() => {
+		const token = localStorage.getItem("token")
+		if (token) {
+			try {
+				return jwt_decode(token)
+			} catch (error) {
+				console.error("Invalid token:", error)
+				return null
+			}
+		}
+		return null
+	})
 
 	const handleLogin = (token) => {
-		const decodedUser = jwt_decode(token)
-		localStorage.setItem("userId", decodedUser.sub)
-		localStorage.setItem("userRole", decodedUser.roles)
-		localStorage.setItem("token", token)
-		setUser(decodedUser)
+		try {
+			const decodedUser = jwt_decode(token)
+
+			localStorage.setItem("userId", decodedUser.sub)
+			localStorage.setItem("userRole", decodedUser.roles)
+			localStorage.setItem("token", token)
+
+			setUser(decodedUser)
+		} catch (error) {
+			console.error("Login failed: invalid token", error)
+		}
 	}
 
 	const handleLogout = () => {
@@ -25,8 +43,17 @@ export const AuthProvider = ({ children }) => {
 		setUser(null)
 	}
 
+	const isAuthenticated = !!user
+
 	return (
-		<AuthContext.Provider value={{ user, handleLogin, handleLogout }}>
+		<AuthContext.Provider
+			value={{
+				user,
+				isAuthenticated,
+				handleLogin,
+				handleLogout
+			}}
+		>
 			{children}
 		</AuthContext.Provider>
 	)
@@ -35,4 +62,3 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
 	return useContext(AuthContext)
 }
-
